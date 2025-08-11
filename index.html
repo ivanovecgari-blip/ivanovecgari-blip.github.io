@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор топливной смеси</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-color: #0d1b2a;
+            --section-bg: #1b263b;
+            --card-bg: #2a3b4d;
+            --primary-text: #e0e0e0;
+            --secondary-text: #aab5c2;
+            --accent-color: #80a4ff;
+            --accent-glow: rgba(128, 164, 255, 0.5);
+            --danger-bg: #660000;
+            --danger-text: #ffcdd2;
+            --danger-border: #ff4d4d;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0; padding: 15px;
+            background-color: var(--bg-color);
+            color: var(--primary-text);
+        }
+        .container { max-width: 500px; margin: 0 auto; }
+        h2 { text-align: center; font-weight: 600; font-size: 1.5em; line-height: 1.4; }
+        h3 { margin-top: 0; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+        
+        .section {
+            background-color: var(--section-bg);
+            border-radius: 16px; padding: 20px; margin-bottom: 20px;
+        }
+
+        .input-group label { margin-bottom: 8px; font-weight: 500; display: block; }
+        .input-group input {
+            width: 100%;
+            padding: 12px; border-radius: 8px; border: 1px solid var(--card-bg);
+            background-color: #415a77; color: var(--primary-text); font-size: 1em;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+        .input-group input:focus {
+            outline: none; border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        
+        .component-card {
+            background-color: var(--card-bg);
+            border-radius: 12px; padding: 15px;
+            margin-bottom: 15px;
+        }
+        .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .lock-checkbox { transform: scale(1.4); flex-shrink: 0; }
+        .title-group { flex-grow: 1; }
+        .title-group label { font-size: 1.1em; font-weight: 600; }
+        .title-group .subtitle { font-size: 0.85em; color: var(--secondary-text); }
+        
+        .card-body, .efficiency-item {
+            display: grid; grid-template-columns: 1fr auto;
+            align-items: center; gap: 15px;
+        }
+        .efficiency-item { margin-bottom: 10px; }
+        .efficiency-item label { font-size: 1em; color: var(--secondary-text); }
+        .value-display { text-align: right; }
+        .percentage { font-size: 1.2em; font-weight: 600; }
+        .mass { font-size: 0.9em; color: var(--secondary-text); display: block; }
+
+        .card-subsection {
+            margin-top: 15px; padding-top: 15px;
+            border-top: 1px solid var(--section-bg);
+        }
+        .subsection-body { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 15px; }
+        .subsection-body label { font-size: 0.9em; color: var(--secondary-text); }
+
+        input[type=range] {
+            -webkit-appearance: none; appearance: none;
+            width: 100%; background: transparent; cursor: pointer;
+        }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 6px; background: var(--section-bg);
+            border-radius: 3px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            margin-top: -6px; height: 18px; width: 18px;
+            background: var(--accent-color); border-radius: 50%;
+            border: 2px solid var(--card-bg);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+        input[type=range]::-moz-range-track {
+            width: 100%; height: 6px; background: var(--section-bg);
+            border-radius: 3px;
+        }
+        input[type=range]::-moz-range-thumb {
+            height: 18px; width: 18px; background: var(--accent-color);
+            border-radius: 50%; border: 2px solid var(--card-bg);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+        
+        .results p, .formulas p { margin: 8px 0; }
+        .results p { display: flex; justify-content: space-between; }
+        .results p span:last-child { font-weight: 600; }
+        .warning {
+            padding: 10px; border-radius: 8px; text-align: center;
+            margin-top: 10px; display: none; border: 1px solid;
+        }
+        #plastic-warning, #wood-warning, #humidity-warning, #low-wood-warning, #plastic-type-warning {
+             background-color: var(--danger-bg); color: var(--danger-text); border-color: var(--danger-border);
+        }
+        .tooltip {
+            position: relative; display: inline-flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--secondary-text); border: 1px solid var(--secondary-text);
+            border-radius: 50%; width: 20px; height: 20px; font-size: 12px;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .tooltip:hover { color: var(--accent-color); border-color: var(--accent-color); }
+        .tooltip .tooltip-text {
+            visibility: hidden; width: 280px; background-color: #2a3b4d;
+            color: #fff; text-align: left; border-radius: 6px; padding: 10px;
+            position: absolute; z-index: 1; bottom: 125%; left: 50%;
+            margin-left: -140px; opacity: 0; transition: opacity 0.3s;
+            font-size: 14px; line-height: 1.4; font-weight: normal;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
+        code { background: #415a77; padding: 2px 4px; border-radius: 4px; font-family: 'Courier New', Courier, monospace;}
+        .hidden { display: none !important; }
+        footer { text-align: center; margin-top: 25px; font-size: 0.9em; color: var(--secondary-text); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Калькулятор топливной смеси для газогенератора Типа Имберт</h2>
+
+    <div class="section">
+        <div class="input-group">
+            <label for="total-mass">Общее количество смеси, кг</label>
+            <input type="number" id="total-mass" value="100">
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Состав смеси</h3>
+        <div class="component-card" id="wood-card">
+            <div class="card-header">
+                <input type="checkbox" class="lock-checkbox" data-id="wood"><div class="title-group"><label for="wood">Древесина</label><span class="subtitle">(щепа, бумага, ветки)</span></div>
+                <span class="tooltip">ⓘ<span class="tooltip-text" id="wood-tooltip-text"></span></span>
+            </div>
+            <div class="card-body">
+                <input type="range" id="wood" min="0" max="100" value="50" step="1">
+                <div class="value-display"><span class="percentage" id="wood-val">50%</span><span class="mass" id="wood-mass">(50.0 кг)</span></div>
+            </div>
+            <div class="card-subsection hidden" id="wood-humidity-block">
+                <div class="subsection-body">
+                    <label for="wood-humidity">Влажность</label>
+                    <div class="value-display"><span class="percentage" id="wood-humidity-val">20%</span></div>
+                    <input type="range" id="wood-humidity" min="0" max="60" value="20" step="1" style="grid-column: 1/-1">
+                </div>
+            </div>
+        </div>
+
+        <div class="component-card" id="plastic-card">
+            <div class="card-header">
+                <input type="checkbox" class="lock-checkbox" data-id="plastic"><div class="title-group"><label for="plastic">Пластик</label><span class="subtitle">(мягкий, ПЭТ)</span></div>
+                <span class="tooltip">ⓘ<span class="tooltip-text" id="plastic-tooltip-text"></span></span>
+            </div>
+            <div class="card-body">
+                <input type="range" id="plastic" min="0" max="100" value="50" step="1">
+                <div class="value-display"><span class="percentage" id="plastic-val">50%</span><span class="mass" id="plastic-mass">(50.0 кг)</span></div>
+            </div>
+        </div>
+
+        <div class="component-card" id="cellophane-card">
+            <div class="card-header">
+                <input type="checkbox" class="lock-checkbox" data-id="cellophane" checked><div class="title-group"><label for="cellophane">Целлофан</label></div>
+                <span class="tooltip">ⓘ<span class="tooltip-text" id="cellophane-tooltip-text"></span></span>
+            </div>
+            <div class="card-body">
+                <input type="range" id="cellophane" min="0" max="100" value="0" step="1" disabled>
+                <div class="value-display"><span class="percentage" id="cellophane-val">0%</span><span class="mass" id="cellophane-mass">(0.0 кг)</span></div>
+            </div>
+        </div>
+
+        <div class="component-card" id="rubber-card">
+            <div class="card-header">
+                <input type="checkbox" class="lock-checkbox" data-id="rubber" checked><div class="title-group"><label for="rubber">Резина</label></div>
+                <span class="tooltip">ⓘ<span class="tooltip-text" id="rubber-tooltip-text"></span></span>
+            </div>
+            <div class="card-body">
+                <input type="range" id="rubber" min="0" max="100" value="0" step="1" disabled>
+                <div class="value-display"><span class="percentage" id="rubber-val">0%</span><span class="mass" id="rubber-mass">(0.0 кг)</span></div>
+            </div>
+        </div>
+
+        <div class="component-card" id="rags-card">
+            <div class="card-header">
+                <input type="checkbox" class="lock-checkbox" data-id="rags" checked><div class="title-group"><label for="rags">Тряпки</label></div>
+                <span class="tooltip">ⓘ<span class="tooltip-text" id="rags-tooltip-text"></span></span>
+            </div>
+            <div class="card-body">
+                <input type="range" id="rags" min="0" max="100" value="0" step="1" disabled>
+                <div class="value-display"><span class="percentage" id="rags-val">0%</span><span class="mass" id="rags-mass">(0.0 кг)</span></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h3>Настройки КПД</h3>
+        <div class="efficiency-item">
+            <label for="eff-gasifier">КПД Газогенератора</label>
+            <div class="value-display"><span class="percentage" id="eff-gasifier-val">66%</span></div>
+            <input type="range" id="eff-gasifier" min="10" max="95" value="66" step="1" style="grid-column: 1/-1">
+        </div>
+        <div class="efficiency-item">
+            <label for="eff-ice">КПД ДВС (на газе)</label>
+            <div class="value-display"><span class="percentage" id="eff-ice-val">25%</span></div>
+            <input type="range" id="eff-ice" min="10" max="50" value="25" step="1" style="grid-column: 1/-1">
+        </div>
+        <div class="efficiency-item">
+            <label for="eff-electric">КПД Электрогенератора</label>
+            <div class="value-display"><span class="percentage" id="eff-electric-val">80%</span></div>
+            <input type="range" id="eff-electric" min="50" max="99" value="80" step="1" style="grid-column: 1/-1">
+        </div>
+    </div>
+    
+    <div class="section results">
+        <h3>⚡️ Результаты</h3>
+        <p><span>Электрическая мощность</span><span id="res-power-el">0 кВт</span></p>
+        <p><span>Тепловая мощность</span><span id="res-power-th">0 кВт</span></p>
+        <div id="humidity-warning" class="warning"></div><div id="plastic-warning" class="warning"></div>
+        <div id="wood-warning" class="warning"></div>
+        <div id="low-wood-warning" class="warning"></div><div id="plastic-type-warning" class="warning"></div>
+    </div>
+
+    <div class="section formulas">
+        <h3>⚙️ Справочные формулы</h3>
+        <p><b>НТС смеси:</b> <code>(НТС₁×%₁) + ...</code></p>
+        <p><b>Тепловая мощность:</b> <code>Мощность(электр) × 2.87</code></p>
+    </div>
+</div>
+
+<footer><p>2025 г. При содействии Лагунова Сергея.</p></footer>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    const LHV_DATA = { wood: 17, plastic: 42, cellophane: 17.5, rubber: 30, rags: 16 };
+    const MJ_TO_KCAL = 239.006;
+    const HUMIDITY_PENALTY_FACTOR = 1.7;
+    const HUMIDITY_THRESHOLD = 25;
+    const THERMAL_POWER_MULTIPLIER = 2.87;
+
+    const inputs = {
+        totalMass: document.getElementById('total-mass'),
+        woodHumidity: document.getElementById('wood-humidity'),
+        sliders: {
+            wood: document.getElementById('wood'),
+            plastic: document.getElementById('plastic'),
+            cellophane: document.getElementById('cellophane'),
+            rubber: document.getElementById('rubber'),
+            rags: document.getElementById('rags'),
+        },
+        efficiencies: {
+            gasifier: document.getElementById('eff-gasifier'),
+            ice: document.getElementById('eff-ice'),
+            electric: document.getElementById('eff-electric'),
+        }
+    };
+    
+    function calculateAndDisplay() {
+        const totalMass = parseFloat(inputs.totalMass.value) || 0;
+        let perc = {};
+        for (const id in inputs.sliders) {
+            perc[id] = parseFloat(inputs.sliders[id].value);
+            document.getElementById(`${id}-val`).textContent = `${Math.round(perc[id])}%`;
+            const mass = (perc[id] / 100) * totalMass;
+            document.getElementById(`${id}-mass`).textContent = `(${mass.toFixed(1)} кг)`;
+        }
+
+        const woodHumidity = parseFloat(inputs.woodHumidity.value);
+        let lhv_wood_effective = LHV_DATA.wood;
+        
+        const humidityWarning = document.getElementById('humidity-warning');
+        if (perc.wood > 0 && woodHumidity > HUMIDITY_THRESHOLD) {
+            lhv_wood_effective = LHV_DATA.wood / HUMIDITY_PENALTY_FACTOR;
+            humidityWarning.style.display = 'block';
+            humidityWarning.textContent = `⚠️ Влажность древесины > ${HUMIDITY_THRESHOLD}%. Эффективность сгорания древесины снижена в ${HUMIDITY_PENALTY_FACTOR} раза.`;
+        } else {
+            humidityWarning.style.display = 'none';
+        }
+        
+        const lhv_mix = ((perc.wood * lhv_wood_effective) + (perc.plastic * LHV_DATA.plastic) + (perc.cellophane * LHV_DATA.cellophane) + (perc.rubber * LHV_DATA.rubber) + (perc.rags * LHV_DATA.rags)) / 100;
+        
+        const eff_gasifier = parseFloat(inputs.efficiencies.gasifier.value) / 100;
+        const eff_ice = parseFloat(inputs.efficiencies.ice.value) / 100;
+        const eff_electric = parseFloat(inputs.efficiencies.electric.value) / 100;
+
+        const fuelConsumption = totalMass; 
+        const totalEnergyIn = (fuelConsumption * lhv_mix) / 3.6;
+        
+        const finalPowerEl = totalEnergyIn * eff_gasifier * eff_ice * eff_electric;
+        const finalPowerTh = finalPowerEl * THERMAL_POWER_MULTIPLIER;
+            
+        document.getElementById('res-power-el').textContent = `${finalPowerEl.toFixed(1)} кВт`;
+        document.getElementById('res-power-th').textContent = `${finalPowerTh.toFixed(1)} кВт`;
+
+        document.getElementById('wood-humidity-block').classList.toggle('hidden', perc.wood <= 0);
+        document.getElementById('plastic-warning').style.display = (perc.plastic + perc.rubber > 40) ? 'block' : 'none';
+        document.getElementById('plastic-warning').textContent = '⚠️ Высокая доля пластика/резины может привести к сильному смолообразованию!';
+        document.getElementById('wood-warning').style.display = (perc.wood > 0 && perc.wood < 50) ? 'block' : 'none';
+        document.getElementById('wood-warning').textContent = 'Осторожно: высокая вероятность засорения и забивания установки.';
+        document.getElementById('low-wood-warning').style.display = (perc.wood > 0 && perc.wood < 30) ? 'block' : 'none';
+        document.getElementById('low-wood-warning').textContent = 'внимание. вероятность что газ будет гореть движется к нулю';
+        document.getElementById('plastic-type-warning').style.display = (perc.plastic > 0 || perc.cellophane > 0) ? 'block' : 'none';
+        document.getElementById('plastic-type-warning').textContent = 'Внимание: Не используйте фторопласт (выделяет фтор) и ПВХ (выделяет хлор). Это ядовитые газы!';
+    }
+
+    function normalizeSliders(changedSliderId) {
+        const sliders = Object.values(inputs.sliders); let lockedTotal = 0; let unlockedSliders = [];
+        for (const slider of sliders) {
+            const id = slider.id; const checkbox = document.querySelector(`.lock-checkbox[data-id="${id}"]`);
+            if (checkbox.checked) { lockedTotal += parseFloat(slider.value); } else { unlockedSliders.push(slider); }
+        }
+        const targetForUnlocked = 100 - lockedTotal;
+        if (targetForUnlocked < 0) {
+            alert("Сумма заблокированных компонентов не может превышать 100%");
+            const checkbox = document.querySelector(`.lock-checkbox[data-id="${changedSliderId}"]`);
+            if (checkbox.checked) checkbox.checked = false; inputs.sliders[changedSliderId].disabled = false;
+            normalizeSliders(changedSliderId); return;
+        }
+        let unlockedCurrentTotal = 0; unlockedSliders.forEach(s => unlockedCurrentTotal += parseFloat(s.value));
+        let diff = unlockedCurrentTotal - targetForUnlocked;
+        let adjustableSliders = unlockedSliders.filter(s => s.id !== changedSliderId);
+        if (unlockedSliders.length === 1 && unlockedSliders[0].id === changedSliderId) { unlockedSliders[0].value = targetForUnlocked;
+        } else {
+            let adjustableTotal = 0; adjustableSliders.forEach(s => adjustableTotal += parseFloat(s.value));
+            if (adjustableTotal > 0) {
+                for (const slider of adjustableSliders) { const reduction = diff * (parseFloat(slider.value) / adjustableTotal); slider.value = Math.max(0, parseFloat(slider.value) - reduction); }
+            } else if (adjustableSliders.length > 0) { const reduction = diff / adjustableSliders.length; adjustableSliders.forEach(s => s.value = Math.max(0, parseFloat(s.value) - reduction)); }
+        }
+        let finalTotal = 0; sliders.forEach(s => finalTotal += parseFloat(s.value));
+        if (Math.round(finalTotal) !== 100) {
+            const mainUnlockedSlider = unlockedSliders.find(s => s.id === changedSliderId) || unlockedSliders[0];
+            if (mainUnlockedSlider) { mainUnlockedSlider.value = parseFloat(mainUnlockedSlider.value) + (100 - finalTotal); }
+        }
+        calculateAndDisplay();
+    }
+    
+    function populateTooltips() {
+        for (const id in LHV_DATA) {
+            const eff_gasifier = parseFloat(inputs.efficiencies.gasifier.value) / 100;
+            const eff_ice = parseFloat(inputs.efficiencies.ice.value) / 100;
+            const eff_electric = parseFloat(inputs.efficiencies.electric.value) / 100;
+
+            const lhv = LHV_DATA[id]; let kgFor1kWh_el;
+            if (id === 'wood') { kgFor1kWh_el = 1.2; } else { kgFor1kWh_el = (1 / (eff_gasifier * eff_ice * eff_electric)) * 3.6 / lhv; }
+            const kgFor1kWh_th = (1 / eff_gasifier) * 3.6 / lhv;
+            const kcal = (lhv * MJ_TO_KCAL).toFixed(0);
+            
+            const tooltipElem = document.getElementById(`${id}-tooltip-text`);
+            tooltipElem.innerHTML = `Теплотворность: <b>~${kcal} ккал/кг</b><hr>Для 1 кВт·ч электричества: <b>${kgFor1kWh_el.toFixed(2)} кг</b><br>Для 1 кВт·ч тепла (в сингазе): <b>${kgFor1kWh_th.toFixed(2)} кг</b>`;
+        }
+    }
+
+    inputs.totalMass.addEventListener('input', calculateAndDisplay);
+    inputs.woodHumidity.addEventListener('input', (e) => {
+        document.getElementById('wood-humidity-val').textContent = `${e.target.value}%`; calculateAndDisplay();
+    });
+    for (const id in inputs.sliders) {
+        inputs.sliders[id].addEventListener('input', () => normalizeSliders(id));
+        const checkbox = document.querySelector(`.lock-checkbox[data-id="${id}"]`);
+        checkbox.addEventListener('change', () => { inputs.sliders[id].disabled = checkbox.checked; normalizeSliders(id); });
+    }
+    for (const id in inputs.efficiencies) {
+        inputs.efficiencies[id].addEventListener('input', (e) => {
+            document.getElementById(`eff-${id}-val`).textContent = `${e.target.value}%`;
+            calculateAndDisplay();
+            populateTooltips();
+        });
+    }
+
+    window.addEventListener('load', () => {
+        populateTooltips(); 
+        calculateAndDisplay();
+        document.getElementById('wood-humidity-val').textContent = `${inputs.woodHumidity.value}%`;
+        document.getElementById('eff-gasifier-val').textContent = `${inputs.efficiencies.gasifier.value}%`;
+        document.getElementById('eff-ice-val').textContent = `${inputs.efficiencies.ice.value}%`;
+        document.getElementById('eff-electric-val').textContent = `${inputs.efficiencies.electric.value}%`;
+    });
+</script>
+
+</body>
+</html>
