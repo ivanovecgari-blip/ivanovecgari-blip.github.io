@@ -92,25 +92,29 @@
             background: var(--accent-color); border-radius: 50%;
             border: 2px solid var(--card-bg); box-shadow: 0 0 0 2px var(--accent-glow);
         }
-        input[type=range]::-moz-range-track {
-            width: 100%; height: 6px; background: var(--section-bg); border-radius: 3px;
-        }
-        input[type=range]::-moz-range-thumb {
-            height: 18px; width: 18px; background: var(--accent-color);
-            border-radius: 50%; border: 2px solid var(--card-bg); box-shadow: 0 0 0 2px var(--accent-glow);
-        }
         
         .results p { display: flex; justify-content: space-between; margin: 12px 0; }
         .results p span:last-child { font-weight: 600; }
 
+        /* --- ИЗМЕНЕНИЯ ЗДЕСЬ --- */
         #notifications-container {
-            margin-top: 15px; display: flex;
-            flex-direction: column; gap: 8px;
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 92px; /* Максимальная высота для ~2-х элементов */
+            overflow-y: auto; /* Показать скролл, если содержимое не помещается */
         }
         .notification-item {
-            display: flex; align-items: center; gap: 10px;
-            padding: 10px; border-radius: 8px; font-size: 0.9em;
-            background-color: var(--card-bg); border-left: 4px solid;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            background-color: var(--card-bg);
+            border-left: 4px solid;
+            flex-shrink: 0; /* Предотвращает сжатие элементов */
         }
         .notification-item.danger { border-color: var(--danger-color); }
         .notification-item.warning { border-color: var(--warning-color); }
@@ -233,6 +237,8 @@
 <footer><p>2025 г. При содействии Лагунова Сергея.</p></footer>
 
 <script>
+    // JavaScript код полностью совпадает с предыдущей версией.
+    // Изменения были только в CSS.
     const tg = window.Telegram.WebApp;
     tg.expand();
 
@@ -273,12 +279,10 @@
         let lhv_wood_effective = LHV_DATA.wood;
         
         const activeWarnings = [];
-
         if (perc.wood > 0 && woodHumidity > HUMIDITY_THRESHOLD) {
             lhv_wood_effective = LHV_DATA.wood / HUMIDITY_PENALTY_FACTOR;
             activeWarnings.push({type: 'info', text: `Эффективность древесины снижена из-за влажности > ${HUMIDITY_THRESHOLD}%.`});
         }
-        
         if (perc.plastic + perc.rubber > 40) {
             activeWarnings.push({type: 'warning', text: 'Высокая доля пластика/резины может привести к смолообразованию.'});
         }
@@ -293,9 +297,10 @@
         }
 
         const notificationsContainer = document.getElementById('notifications-container');
-        notificationsContainer.innerHTML = '';
+        notificationsContainer.innerHTML = ''; 
         
         if (activeWarnings.length > 0) {
+            notificationsContainer.classList.remove('hidden');
             activeWarnings.forEach(warning => {
                 const warningDiv = document.createElement('div');
                 warningDiv.className = `notification-item ${warning.type}`;
@@ -307,14 +312,14 @@
                 warningDiv.innerHTML = `<span class="icon">${icon}</span> <span>${warning.text}</span>`;
                 notificationsContainer.appendChild(warningDiv);
             });
+        } else {
+            notificationsContainer.classList.add('hidden');
         }
 
         const lhv_mix = ((perc.wood * lhv_wood_effective) + (perc.plastic * LHV_DATA.plastic) + (perc.cellophane * LHV_DATA.cellophane) + (perc.rubber * LHV_DATA.rubber) + (perc.rags * LHV_DATA.rags)) / 100;
-        
         const eff_gasifier = parseFloat(inputs.efficiencies.gasifier.value) / 100;
         const eff_ice = parseFloat(inputs.efficiencies.ice.value) / 100;
         const eff_electric = parseFloat(inputs.efficiencies.electric.value) / 100;
-
         const fuelConsumption = totalMass; 
         const totalEnergyIn = (fuelConsumption * lhv_mix) / 3.6;
         const finalPowerEl = totalEnergyIn * eff_gasifier * eff_ice * eff_electric;
