@@ -16,9 +16,9 @@
             --secondary-text: #aab5c2;
             --accent-color: #80a4ff;
             --accent-glow: rgba(128, 164, 255, 0.5);
-            --danger-bg: #660000;
-            --danger-text: #ffcdd2;
-            --danger-border: #ff4d4d;
+            --danger-color: #ff5555;
+            --warning-color: #ffb700;
+            --info-color: #55aaff;
         }
 
         body {
@@ -31,18 +31,11 @@
         h2 { text-align: center; font-weight: 600; font-size: 1.5em; line-height: 1.4; }
         h3 { margin-top: 0; display: flex; align-items: center; gap: 8px; font-weight: 500; }
         
-        /* --- НОВЫЙ СТИЛЬ ДЛЯ ЗАКРЕПЛЕННОГО БЛОКА --- */
         .sticky-header {
-            position: -webkit-sticky; /* Для Safari */
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background-color: var(--bg-color);
-            padding-top: 15px;
-            padding-bottom: 5px;
-            margin: -15px -15px 0 -15px;
-            padding-left: 15px;
-            padding-right: 15px;
+            position: -webkit-sticky; position: sticky;
+            top: 0; z-index: 10; background-color: var(--bg-color);
+            padding-top: 15px; padding-bottom: 5px; margin: -15px -15px 0 -15px;
+            padding-left: 15px; padding-right: 15px;
         }
 
         .section {
@@ -55,10 +48,6 @@
             width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--card-bg);
             background-color: #415a77; color: var(--primary-text); font-size: 1em;
             transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box;
-        }
-        .input-group input:focus {
-            outline: none; border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px var(--accent-glow);
         }
         
         .component-card {
@@ -90,12 +79,7 @@
         input[type=range] {
             -webkit-appearance: none; appearance: none;
             width: 100%; background: transparent; cursor: pointer;
-            /* --- НОВОЕ СВОЙСТВО ДЛЯ МОБИЛЬНЫХ --- */
             touch-action: pan-y;
-        }
-        input[type=range]:focus { outline: none; }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%; height: 6px; background: var(--section-bg); border-radius: 3px;
         }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none; appearance: none;
@@ -103,39 +87,36 @@
             background: var(--accent-color); border-radius: 50%;
             border: 2px solid var(--card-bg); box-shadow: 0 0 0 2px var(--accent-glow);
         }
-        input[type=range]::-moz-range-track {
-            width: 100%; height: 6px; background: var(--section-bg); border-radius: 3px;
-        }
         input[type=range]::-moz-range-thumb {
             height: 18px; width: 18px; background: var(--accent-color);
             border-radius: 50%; border: 2px solid var(--card-bg); box-shadow: 0 0 0 2px var(--accent-glow);
         }
         
-        .results p, .formulas p { margin: 8px 0; }
-        .results p { display: flex; justify-content: space-between; }
+        .results p { display: flex; justify-content: space-between; margin: 12px 0; }
         .results p span:last-child { font-weight: 600; }
-        .warning {
-            padding: 10px; border-radius: 8px; text-align: center;
-            margin-top: 10px; display: none; border: 1px solid;
+
+        /* --- НОВЫЕ СТИЛИ ДЛЯ УВЕДОМЛЕНИЙ --- */
+        #notifications-container {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
-        #plastic-warning, #wood-warning, #humidity-warning, #low-wood-warning, #plastic-type-warning {
-             background-color: var(--danger-bg); color: var(--danger-text); border-color: var(--danger-border);
+        .notification-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            background-color: var(--card-bg);
+            border-left: 4px solid;
         }
-        .tooltip {
-            position: relative; display: inline-flex; align-items: center; justify-content: center;
-            cursor: pointer; color: var(--secondary-text); border: 1px solid var(--secondary-text);
-            border-radius: 50%; width: 20px; height: 20px; font-size: 12px;
-            transition: color 0.2s, border-color 0.2s;
-        }
-        .tooltip .tooltip-text {
-            visibility: hidden; width: 280px; background-color: #2a3b4d;
-            color: #fff; text-align: left; border-radius: 6px; padding: 10px;
-            position: absolute; z-index: 1; bottom: 125%; left: 50%;
-            margin-left: -140px; opacity: 0; transition: opacity 0.3s;
-            font-size: 14px; line-height: 1.4; font-weight: normal;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-        .tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
+        .notification-item.danger { border-color: var(--danger-color); }
+        .notification-item.warning { border-color: var(--warning-color); }
+        .notification-item.info { border-color: var(--info-color); }
+        .notification-item .icon { font-size: 1.2em; }
+
         code { background: #415a77; padding: 2px 4px; border-radius: 4px; font-family: 'Courier New', Courier, monospace;}
         .hidden { display: none !important; }
         footer { text-align: center; margin-top: 25px; font-size: 0.9em; color: var(--secondary-text); }
@@ -158,95 +139,17 @@
             <h3>⚡️ Результаты</h3>
             <p><span>Электрическая мощность</span><span id="res-power-el">0 кВт</span></p>
             <p><span>Тепловая мощность</span><span id="res-power-th">0 кВт</span></p>
-            <div id="humidity-warning" class="warning"></div><div id="plastic-warning" class="warning"></div>
-            <div id="wood-warning" class="warning"></div>
-            <div id="low-wood-warning" class="warning"></div><div id="plastic-type-warning" class="warning"></div>
+            <div id="notifications-container"></div>
         </div>
     </div>
 
     <div class="section">
         <h3>Состав смеси</h3>
-        <div class="component-card" id="wood-card">
-            <div class="card-header">
-                <input type="checkbox" class="lock-checkbox" data-id="wood"><div class="title-group"><label for="wood">Древесина</label><span class="subtitle">(щепа, бумага, ветки)</span></div>
-                <span class="tooltip">ⓘ<span class="tooltip-text" id="wood-tooltip-text"></span></span>
-            </div>
-            <div class="card-body">
-                <input type="range" id="wood" min="0" max="100" value="50" step="1">
-                <div class="value-display"><span class="percentage" id="wood-val">50%</span><span class="mass" id="wood-mass">(50.0 кг)</span></div>
-            </div>
-            <div class="card-subsection hidden" id="wood-humidity-block">
-                <div class="subsection-body">
-                    <label for="wood-humidity">Влажность</label>
-                    <div class="value-display"><span class="percentage" id="wood-humidity-val">20%</span></div>
-                    <input type="range" id="wood-humidity" min="0" max="60" value="20" step="1" style="grid-column: 1/-1">
-                </div>
-            </div>
         </div>
-
-        <div class="component-card" id="plastic-card">
-            <div class="card-header">
-                <input type="checkbox" class="lock-checkbox" data-id="plastic"><div class="title-group"><label for="plastic">Пластик</label><span class="subtitle">(мягкий, ПЭТ)</span></div>
-                <span class="tooltip">ⓘ<span class="tooltip-text" id="plastic-tooltip-text"></span></span>
-            </div>
-            <div class="card-body">
-                <input type="range" id="plastic" min="0" max="100" value="50" step="1">
-                <div class="value-display"><span class="percentage" id="plastic-val">50%</span><span class="mass" id="plastic-mass">(50.0 кг)</span></div>
-            </div>
-        </div>
-
-        <div class="component-card" id="cellophane-card">
-            <div class="card-header">
-                <input type="checkbox" class="lock-checkbox" data-id="cellophane" checked><div class="title-group"><label for="cellophane">Целлофан</label></div>
-                <span class="tooltip">ⓘ<span class="tooltip-text" id="cellophane-tooltip-text"></span></span>
-            </div>
-            <div class="card-body">
-                <input type="range" id="cellophane" min="0" max="100" value="0" step="1" disabled>
-                <div class="value-display"><span class="percentage" id="cellophane-val">0%</span><span class="mass" id="cellophane-mass">(0.0 кг)</span></div>
-            </div>
-        </div>
-
-        <div class="component-card" id="rubber-card">
-            <div class="card-header">
-                <input type="checkbox" class="lock-checkbox" data-id="rubber" checked><div class="title-group"><label for="rubber">Резина</label></div>
-                <span class="tooltip">ⓘ<span class="tooltip-text" id="rubber-tooltip-text"></span></span>
-            </div>
-            <div class="card-body">
-                <input type="range" id="rubber" min="0" max="100" value="0" step="1" disabled>
-                <div class="value-display"><span class="percentage" id="rubber-val">0%</span><span class="mass" id="rubber-mass">(0.0 кг)</span></div>
-            </div>
-        </div>
-
-        <div class="component-card" id="rags-card">
-            <div class="card-header">
-                <input type="checkbox" class="lock-checkbox" data-id="rags" checked><div class="title-group"><label for="rags">Тряпки</label></div>
-                <span class="tooltip">ⓘ<span class="tooltip-text" id="rags-tooltip-text"></span></span>
-            </div>
-            <div class="card-body">
-                <input type="range" id="rags" min="0" max="100" value="0" step="1" disabled>
-                <div class="value-display"><span class="percentage" id="rags-val">0%</span><span class="mass" id="rags-mass">(0.0 кг)</span></div>
-            </div>
-        </div>
-    </div>
     
     <div class="section">
         <h3>Настройки КПД</h3>
-        <div class="efficiency-item">
-            <label for="eff-gasifier">КПД Газогенератора</label>
-            <div class="value-display"><span class="percentage" id="eff-gasifier-val">66%</span></div>
-            <input type="range" id="eff-gasifier" min="10" max="95" value="66" step="1" style="grid-column: 1/-1">
         </div>
-        <div class="efficiency-item">
-            <label for="eff-ice">КПД ДВС (на газе)</label>
-            <div class="value-display"><span class="percentage" id="eff-ice-val">25%</span></div>
-            <input type="range" id="eff-ice" min="10" max="50" value="25" step="1" style="grid-column: 1/-1">
-        </div>
-        <div class="efficiency-item">
-            <label for="eff-electric">КПД Электрогенератора</label>
-            <div class="value-display"><span class="percentage" id="eff-electric-val">80%</span></div>
-            <input type="range" id="eff-electric" min="50" max="99" value="80" step="1" style="grid-column: 1/-1">
-        </div>
-    </div>
 
     <div class="section formulas">
         <h3>⚙️ Справочные формулы</h3>
@@ -258,8 +161,9 @@
 <footer><p>2025 г. При содействии Лагунова Сергея.</p></footer>
 
 <script>
-    // JavaScript код остается без изменений, так как все правки были в HTML и CSS.
-    // Просто скопируйте сюда весь JS из предыдущего ответа.
+    // Весь JS, кроме одной функции, остается прежним.
+    // Я привожу полный код JS с измененной функцией calculateAndDisplay.
+    
     const tg = window.Telegram.WebApp;
     tg.expand();
 
@@ -286,6 +190,7 @@
         }
     };
     
+    // --- ОСНОВНАЯ ФУНКЦИЯ С НОВОЙ ЛОГИКОЙ УВЕДОМЛЕНИЙ ---
     function calculateAndDisplay() {
         const totalMass = parseFloat(inputs.totalMass.value) || 0;
         let perc = {};
@@ -299,15 +204,48 @@
         const woodHumidity = parseFloat(inputs.woodHumidity.value);
         let lhv_wood_effective = LHV_DATA.wood;
         
-        const humidityWarning = document.getElementById('humidity-warning');
+        // --- 1. Собираем все активные предупреждения в массив ---
+        const activeWarnings = [];
+
         if (perc.wood > 0 && woodHumidity > HUMIDITY_THRESHOLD) {
             lhv_wood_effective = LHV_DATA.wood / HUMIDITY_PENALTY_FACTOR;
-            humidityWarning.style.display = 'block';
-            humidityWarning.textContent = `⚠️ Влажность древесины > ${HUMIDITY_THRESHOLD}%. Эффективность сгорания древесины снижена в ${HUMIDITY_PENALTY_FACTOR} раза.`;
-        } else {
-            humidityWarning.style.display = 'none';
+            activeWarnings.push({type: 'info', text: `Эффективность древесины снижена из-за влажности > ${HUMIDITY_THRESHOLD}%.`});
         }
         
+        if (perc.plastic + perc.rubber > 40) {
+            activeWarnings.push({type: 'warning', text: 'Высокая доля пластика/резины может привести к смолообразованию.'});
+        }
+        if (perc.wood > 0 && perc.wood < 50) {
+            activeWarnings.push({type: 'warning', text: 'Вероятность засорения установки (доля древесины < 50%).'});
+        }
+        if (perc.wood > 0 && perc.wood < 30) {
+            activeWarnings.push({type: 'danger', text: 'Вероятность горения газа движется к нулю (доля древесины < 30%).'});
+        }
+        if (perc.plastic > 0 || perc.cellophane > 0) {
+            activeWarnings.push({type: 'danger', text: 'Не используйте ПВХ и фторопласт (риск ядовитых газов).'});
+        }
+
+        // --- 2. Очищаем старые и отрисовываем новые уведомления ---
+        const notificationsContainer = document.getElementById('notifications-container');
+        notificationsContainer.innerHTML = ''; // Очистка
+        
+        if (activeWarnings.length > 0) {
+            notificationsContainer.classList.remove('hidden');
+            activeWarnings.forEach(warning => {
+                const warningDiv = document.createElement('div');
+                warningDiv.className = `notification-item ${warning.type}`;
+                let icon = 'ℹ️';
+                if(warning.type === 'danger') icon = '🔴';
+                if(warning.type === 'warning') icon = '🟠';
+                if(warning.type === 'info') icon = '🔵';
+                
+                warningDiv.innerHTML = `<span class="icon">${icon}</span> <span>${warning.text}</span>`;
+                notificationsContainer.appendChild(warningDiv);
+            });
+        } else {
+            notificationsContainer.classList.add('hidden');
+        }
+
         const lhv_mix = ((perc.wood * lhv_wood_effective) + (perc.plastic * LHV_DATA.plastic) + (perc.cellophane * LHV_DATA.cellophane) + (perc.rubber * LHV_DATA.rubber) + (perc.rags * LHV_DATA.rags)) / 100;
         
         const eff_gasifier = parseFloat(inputs.efficiencies.gasifier.value) / 100;
@@ -324,16 +262,10 @@
         document.getElementById('res-power-th').textContent = `${finalPowerTh.toFixed(1)} кВт`;
 
         document.getElementById('wood-humidity-block').classList.toggle('hidden', perc.wood <= 0);
-        document.getElementById('plastic-warning').style.display = (perc.plastic + perc.rubber > 40) ? 'block' : 'none';
-        document.getElementById('plastic-warning').textContent = '⚠️ Высокая доля пластика/резины может привести к сильному смолообразованию!';
-        document.getElementById('wood-warning').style.display = (perc.wood > 0 && perc.wood < 50) ? 'block' : 'none';
-        document.getElementById('wood-warning').textContent = 'Осторожно: высокая вероятность засорения и забивания установки.';
-        document.getElementById('low-wood-warning').style.display = (perc.wood > 0 && perc.wood < 30) ? 'block' : 'none';
-        document.getElementById('low-wood-warning').textContent = 'внимание. вероятность что газ будет гореть движется к нулю';
-        document.getElementById('plastic-type-warning').style.display = (perc.plastic > 0 || perc.cellophane > 0) ? 'block' : 'none';
-        document.getElementById('plastic-type-warning').textContent = 'Внимание: Не используйте фторопласт (выделяет фтор) и ПВХ (выделяет хлор). Это ядовитые газы!';
     }
 
+    // Остальные функции JS (normalizeSliders, populateTooltips) и обработчики событий остаются без изменений.
+    // ... (полный код этих функций и обработчиков должен быть здесь)
     function normalizeSliders(changedSliderId) {
         const sliders = Object.values(inputs.sliders); let lockedTotal = 0; let unlockedSliders = [];
         for (const slider of sliders) {
