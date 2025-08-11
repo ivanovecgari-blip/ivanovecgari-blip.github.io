@@ -31,6 +31,20 @@
         h2 { text-align: center; font-weight: 600; font-size: 1.5em; line-height: 1.4; }
         h3 { margin-top: 0; display: flex; align-items: center; gap: 8px; font-weight: 500; }
         
+        /* --- НОВЫЙ СТИЛЬ ДЛЯ ЗАКРЕПЛЕННОГО БЛОКА --- */
+        .sticky-header {
+            position: -webkit-sticky; /* Для Safari */
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: var(--bg-color);
+            padding-top: 15px;
+            padding-bottom: 5px;
+            margin: -15px -15px 0 -15px;
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
         .section {
             background-color: var(--section-bg);
             border-radius: 16px; padding: 20px; margin-bottom: 20px;
@@ -38,11 +52,9 @@
 
         .input-group label { margin-bottom: 8px; font-weight: 500; display: block; }
         .input-group input {
-            width: 100%;
-            padding: 12px; border-radius: 8px; border: 1px solid var(--card-bg);
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--card-bg);
             background-color: #415a77; color: var(--primary-text); font-size: 1em;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box;
         }
         .input-group input:focus {
             outline: none; border-color: var(--accent-color);
@@ -51,8 +63,7 @@
         
         .component-card {
             background-color: var(--card-bg);
-            border-radius: 12px; padding: 15px;
-            margin-bottom: 15px;
+            border-radius: 12px; padding: 15px; margin-bottom: 15px;
         }
         .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
         .lock-checkbox { transform: scale(1.4); flex-shrink: 0; }
@@ -71,8 +82,7 @@
         .mass { font-size: 0.9em; color: var(--secondary-text); display: block; }
 
         .card-subsection {
-            margin-top: 15px; padding-top: 15px;
-            border-top: 1px solid var(--section-bg);
+            margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--section-bg);
         }
         .subsection-body { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 15px; }
         .subsection-body label { font-size: 0.9em; color: var(--secondary-text); }
@@ -80,27 +90,25 @@
         input[type=range] {
             -webkit-appearance: none; appearance: none;
             width: 100%; background: transparent; cursor: pointer;
+            /* --- НОВОЕ СВОЙСТВО ДЛЯ МОБИЛЬНЫХ --- */
+            touch-action: pan-y;
         }
         input[type=range]:focus { outline: none; }
         input[type=range]::-webkit-slider-runnable-track {
-            width: 100%; height: 6px; background: var(--section-bg);
-            border-radius: 3px;
+            width: 100%; height: 6px; background: var(--section-bg); border-radius: 3px;
         }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none; appearance: none;
             margin-top: -6px; height: 18px; width: 18px;
             background: var(--accent-color); border-radius: 50%;
-            border: 2px solid var(--card-bg);
-            box-shadow: 0 0 0 2px var(--accent-glow);
+            border: 2px solid var(--card-bg); box-shadow: 0 0 0 2px var(--accent-glow);
         }
         input[type=range]::-moz-range-track {
-            width: 100%; height: 6px; background: var(--section-bg);
-            border-radius: 3px;
+            width: 100%; height: 6px; background: var(--section-bg); border-radius: 3px;
         }
         input[type=range]::-moz-range-thumb {
             height: 18px; width: 18px; background: var(--accent-color);
-            border-radius: 50%; border: 2px solid var(--card-bg);
-            box-shadow: 0 0 0 2px var(--accent-glow);
+            border-radius: 50%; border: 2px solid var(--card-bg); box-shadow: 0 0 0 2px var(--accent-glow);
         }
         
         .results p, .formulas p { margin: 8px 0; }
@@ -119,7 +127,6 @@
             border-radius: 50%; width: 20px; height: 20px; font-size: 12px;
             transition: color 0.2s, border-color 0.2s;
         }
-        .tooltip:hover { color: var(--accent-color); border-color: var(--accent-color); }
         .tooltip .tooltip-text {
             visibility: hidden; width: 280px; background-color: #2a3b4d;
             color: #fff; text-align: left; border-radius: 6px; padding: 10px;
@@ -138,11 +145,22 @@
 
 <div class="container">
     <h2>Калькулятор топливной смеси для газогенератора Типа Имберт</h2>
+    
+    <div class="sticky-header">
+        <div class="section">
+            <div class="input-group">
+                <label for="total-mass">Общее количество смеси, кг</label>
+                <input type="number" id="total-mass" value="100">
+            </div>
+        </div>
 
-    <div class="section">
-        <div class="input-group">
-            <label for="total-mass">Общее количество смеси, кг</label>
-            <input type="number" id="total-mass" value="100">
+        <div class="section results">
+            <h3>⚡️ Результаты</h3>
+            <p><span>Электрическая мощность</span><span id="res-power-el">0 кВт</span></p>
+            <p><span>Тепловая мощность</span><span id="res-power-th">0 кВт</span></p>
+            <div id="humidity-warning" class="warning"></div><div id="plastic-warning" class="warning"></div>
+            <div id="wood-warning" class="warning"></div>
+            <div id="low-wood-warning" class="warning"></div><div id="plastic-type-warning" class="warning"></div>
         </div>
     </div>
 
@@ -229,15 +247,6 @@
             <input type="range" id="eff-electric" min="50" max="99" value="80" step="1" style="grid-column: 1/-1">
         </div>
     </div>
-    
-    <div class="section results">
-        <h3>⚡️ Результаты</h3>
-        <p><span>Электрическая мощность</span><span id="res-power-el">0 кВт</span></p>
-        <p><span>Тепловая мощность</span><span id="res-power-th">0 кВт</span></p>
-        <div id="humidity-warning" class="warning"></div><div id="plastic-warning" class="warning"></div>
-        <div id="wood-warning" class="warning"></div>
-        <div id="low-wood-warning" class="warning"></div><div id="plastic-type-warning" class="warning"></div>
-    </div>
 
     <div class="section formulas">
         <h3>⚙️ Справочные формулы</h3>
@@ -249,6 +258,8 @@
 <footer><p>2025 г. При содействии Лагунова Сергея.</p></footer>
 
 <script>
+    // JavaScript код остается без изменений, так как все правки были в HTML и CSS.
+    // Просто скопируйте сюда весь JS из предыдущего ответа.
     const tg = window.Telegram.WebApp;
     tg.expand();
 
