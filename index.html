@@ -28,19 +28,19 @@
             color: var(--primary-text);
         }
         .container { max-width: 500px; margin: 0 auto; }
-        h2 { text-align: center; font-weight: 600; font-size: 1.3em; line-height: 1.4; margin-bottom: 15px;}
+        h2 { text-align: center; font-weight: 600; font-size: 1.3em; line-height: 1.4; margin-bottom: 15px; margin-top: 0;}
         h3 { margin-top: 0; display: flex; align-items: center; gap: 8px; font-weight: 500; }
         
         .sticky-header {
             position: -webkit-sticky; position: sticky;
-            top: -1px; /* небольшой хак для лучшего вида тени */
+            top: -1px; 
             z-index: 10;
             background-color: var(--bg-color);
             padding-top: 15px;
             margin: -15px -15px 0 -15px;
             padding-left: 15px;
             padding-right: 15px;
-            box-shadow: 0 4px S12px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
         .section {
@@ -71,8 +71,8 @@
         }
         .efficiency-item { padding: 15px; margin-bottom: 15px; background-color: var(--card-bg); border-radius: 12px; }
         .efficiency-item .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .efficiency-item label { font-size: 1em; color: var(--secondary-text); }
-
+        .efficiency-item label { font-size: 1em; color: var(--primary-text); font-weight: 500;}
+        
         .value-display { text-align: right; }
         .percentage { font-size: 1.2em; font-weight: 600; }
         .mass { font-size: 0.9em; color: var(--secondary-text); display: block; }
@@ -88,8 +88,23 @@
             width: 100%; background: transparent; cursor: pointer;
             touch-action: pan-y;
         }
-        
-        /* ... (остальные стили слайдеров без изменений) ... */
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 6px; background: var(--section-bg); border-radius: 3px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            margin-top: -6px; height: 18px; width: 18px;
+            background: var(--accent-color); border-radius: 50%;
+            border: 2px solid var(--card-bg); box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+        input[type=range]::-moz-range-track {
+             width: 100%; height: 6px; background: var(--section-bg); border-radius: 3px;
+        }
+        input[type=range]::-moz-range-thumb {
+            height: 18px; width: 18px; background: var(--accent-color);
+            border-radius: 50%; border: 2px solid var(--card-bg); box-shadow: 0 0 0 2px var(--accent-glow);
+        }
         
         .results p { display: flex; justify-content: space-between; margin: 12px 0; }
         .results p span:last-child { font-weight: 600; }
@@ -112,8 +127,24 @@
         code { background: #415a77; padding: 2px 4px; border-radius: 4px; font-family: 'Courier New', Courier, monospace;}
         .hidden { display: none !important; }
         footer { text-align: center; margin-top: 25px; font-size: 0.9em; color: var(--secondary-text); }
+        
+        .tooltip {
+            position: relative; display: inline-flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--secondary-text); border: 1px solid var(--secondary-text);
+            border-radius: 50%; width: 20px; height: 20px; font-size: 12px;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .tooltip:hover { color: var(--accent-color); border-color: var(--accent-color); }
+        .tooltip .tooltip-text {
+            visibility: hidden; width: 280px; background-color: #2a3b4d;
+            color: #fff; text-align: left; border-radius: 6px; padding: 10px;
+            position: absolute; z-index: 1; bottom: 125%; left: 50%;
+            margin-left: -140px; opacity: 0; transition: opacity 0.3s;
+            font-size: 14px; line-height: 1.4; font-weight: normal;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
 
-        /* --- НОВЫЙ БЛОК: АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ --- */
         @media (max-width: 480px) {
             h2 { font-size: 1.1em; }
             .section { padding: 15px; }
@@ -145,7 +176,68 @@
 
     <div class="section">
         <h3>Состав смеси</h3>
+        <div class="component-card" id="wood-card">
+            <div class="card-header">
+                <input type="checkbox" class="lock-checkbox" data-id="wood"><div class="title-group"><label for="wood">Древесина</label><span class="subtitle">(щепа, бумага, ветки)</span></div>
+                <span class="tooltip">ⓘ<span class="tooltip-text" id="wood-tooltip-text"></span></span>
+            </div>
+            <div class="card-body">
+                <input type="range" id="wood" min="0" max="100" value="50" step="1">
+                <div class="value-display"><span class="percentage" id="wood-val">50%</span><span class="mass" id="wood-mass">(50.0 кг)</span></div>
+            </div>
+            <div class="card-subsection hidden" id="wood-humidity-block">
+                <div class="subsection-body">
+                    <label for="wood-humidity">Влажность</label>
+                    <div class="value-display"><span class="percentage" id="wood-humidity-val">20%</span></div>
+                    <input type="range" id="wood-humidity" min="0" max="60" value="20" step="1" style="grid-column: 1/-1">
+                </div>
+            </div>
         </div>
+
+        <div class="component-card" id="plastic-card">
+            <div class="card-header">
+                <input type="checkbox" class="lock-checkbox" data-id="plastic"><div class="title-group"><label for="plastic">Пластик</label><span class="subtitle">(мягкий, ПЭТ)</span></div>
+                <span class="tooltip">ⓘ<span class="tooltip-text" id="plastic-tooltip-text"></span></span>
+            </div>
+            <div class="card-body">
+                <input type="range" id="plastic" min="0" max="100" value="50" step="1">
+                <div class="value-display"><span class="percentage" id="plastic-val">50%</span><span class="mass" id="plastic-mass">(50.0 кг)</span></div>
+            </div>
+        </div>
+
+        <div class="component-card" id="cellophane-card">
+            <div class="card-header">
+                <input type="checkbox" class="lock-checkbox" data-id="cellophane" checked><div class="title-group"><label for="cellophane">Целлофан</label></div>
+                <span class="tooltip">ⓘ<span class="tooltip-text" id="cellophane-tooltip-text"></span></span>
+            </div>
+            <div class="card-body">
+                <input type="range" id="cellophane" min="0" max="100" value="0" step="1" disabled>
+                <div class="value-display"><span class="percentage" id="cellophane-val">0%</span><span class="mass" id="cellophane-mass">(0.0 кг)</span></div>
+            </div>
+        </div>
+
+        <div class="component-card" id="rubber-card">
+            <div class="card-header">
+                <input type="checkbox" class="lock-checkbox" data-id="rubber" checked><div class="title-group"><label for="rubber">Резина</label></div>
+                <span class="tooltip">ⓘ<span class="tooltip-text" id="rubber-tooltip-text"></span></span>
+            </div>
+            <div class="card-body">
+                <input type="range" id="rubber" min="0" max="100" value="0" step="1" disabled>
+                <div class="value-display"><span class="percentage" id="rubber-val">0%</span><span class="mass" id="rubber-mass">(0.0 кг)</span></div>
+            </div>
+        </div>
+
+        <div class="component-card" id="rags-card">
+            <div class="card-header">
+                <input type="checkbox" class="lock-checkbox" data-id="rags" checked><div class="title-group"><label for="rags">Тряпки</label></div>
+                <span class="tooltip">ⓘ<span class="tooltip-text" id="rags-tooltip-text"></span></span>
+            </div>
+            <div class="card-body">
+                <input type="range" id="rags" min="0" max="100" value="0" step="1" disabled>
+                <div class="value-display"><span class="percentage" id="rags-val">0%</span><span class="mass" id="rags-mass">(0.0 кг)</span></div>
+            </div>
+        </div>
+    </div>
     
     <div class="section">
         <h3>Настройки КПД</h3>
@@ -174,14 +266,14 @@
 
     <div class="section formulas">
         <h3>⚙️ Справочные формулы</h3>
-        </div>
+        <p><b>НТС смеси:</b> <code>(НТС₁×%₁) + ...</code></p>
+        <p><b>Тепловая мощность:</b> <code>Мощность(электр) × 2.87</code></p>
+    </div>
 </div>
 
 <footer><p>2025 г. При содействии Лагунова Сергея.</p></footer>
 
 <script>
-    // Весь JavaScript код остается без изменений.
-    // Я привожу его полностью для вашего удобства.
     const tg = window.Telegram.WebApp;
     tg.expand();
 
@@ -209,18 +301,147 @@
     };
     
     function calculateAndDisplay() {
-        // ... (функция без изменений)
+        const totalMass = parseFloat(inputs.totalMass.value) || 0;
+        let perc = {};
+        for (const id in inputs.sliders) {
+            perc[id] = parseFloat(inputs.sliders[id].value);
+            document.getElementById(`${id}-val`).textContent = `${Math.round(perc[id])}%`;
+            const mass = (perc[id] / 100) * totalMass;
+            document.getElementById(`${id}-mass`).textContent = `(${mass.toFixed(1)} кг)`;
+        }
+
+        const woodHumidity = parseFloat(inputs.woodHumidity.value);
+        let lhv_wood_effective = LHV_DATA.wood;
+        
+        const activeWarnings = [];
+
+        if (perc.wood > 0 && woodHumidity > HUMIDITY_THRESHOLD) {
+            lhv_wood_effective = LHV_DATA.wood / HUMIDITY_PENALTY_FACTOR;
+            activeWarnings.push({type: 'info', text: `Эффективность древесины снижена из-за влажности > ${HUMIDITY_THRESHOLD}%.`});
+        }
+        
+        if (perc.plastic + perc.rubber > 40) {
+            activeWarnings.push({type: 'warning', text: 'Высокая доля пластика/резины может привести к смолообразованию.'});
+        }
+        if (perc.wood > 0 && perc.wood < 50) {
+            activeWarnings.push({type: 'warning', text: 'Вероятность засорения установки (доля древесины < 50%).'});
+        }
+        if (perc.wood > 0 && perc.wood < 30) {
+            activeWarnings.push({type: 'danger', text: 'внимание. вероятность что газ будет гореть движется к нулю'});
+        }
+        if (perc.plastic > 0 || perc.cellophane > 0) {
+            activeWarnings.push({type: 'danger', text: 'Не используйте ПВХ и фторопласт (риск ядовитых газов).'});
+        }
+
+        const notificationsContainer = document.getElementById('notifications-container');
+        notificationsContainer.innerHTML = '';
+        
+        if (activeWarnings.length > 0) {
+            activeWarnings.forEach(warning => {
+                const warningDiv = document.createElement('div');
+                warningDiv.className = `notification-item ${warning.type}`;
+                let icon = 'ℹ️';
+                if(warning.type === 'danger') icon = '🔴';
+                if(warning.type === 'warning') icon = '🟠';
+                if(warning.type === 'info') icon = '🔵';
+                
+                warningDiv.innerHTML = `<span class="icon">${icon}</span> <span>${warning.text}</span>`;
+                notificationsContainer.appendChild(warningDiv);
+            });
+        }
+
+        const lhv_mix = ((perc.wood * lhv_wood_effective) + (perc.plastic * LHV_DATA.plastic) + (perc.cellophane * LHV_DATA.cellophane) + (perc.rubber * LHV_DATA.rubber) + (perc.rags * LHV_DATA.rags)) / 100;
+        
+        const eff_gasifier = parseFloat(inputs.efficiencies.gasifier.value) / 100;
+        const eff_ice = parseFloat(inputs.efficiencies.ice.value) / 100;
+        const eff_electric = parseFloat(inputs.efficiencies.electric.value) / 100;
+
+        const fuelConsumption = totalMass; 
+        const totalEnergyIn = (fuelConsumption * lhv_mix) / 3.6;
+        const finalPowerEl = totalEnergyIn * eff_gasifier * eff_ice * eff_electric;
+        const finalPowerTh = finalPowerEl * THERMAL_POWER_MULTIPLIER;
+            
+        document.getElementById('res-power-el').textContent = `${finalPowerEl.toFixed(1)} кВт`;
+        document.getElementById('res-power-th').textContent = `${finalPowerTh.toFixed(1)} кВт`;
+
+        document.getElementById('wood-humidity-block').classList.toggle('hidden', perc.wood <= 0);
     }
 
     function normalizeSliders(changedSliderId) {
-        // ... (функция без изменений)
+        const sliders = Object.values(inputs.sliders); let lockedTotal = 0; let unlockedSliders = [];
+        for (const slider of sliders) {
+            const id = slider.id; const checkbox = document.querySelector(`.lock-checkbox[data-id="${id}"]`);
+            if (checkbox.checked) { lockedTotal += parseFloat(slider.value); } else { unlockedSliders.push(slider); }
+        }
+        const targetForUnlocked = 100 - lockedTotal;
+        if (targetForUnlocked < 0) {
+            alert("Сумма заблокированных компонентов не может превышать 100%");
+            const checkbox = document.querySelector(`.lock-checkbox[data-id="${changedSliderId}"]`);
+            if (checkbox.checked) checkbox.checked = false; inputs.sliders[changedSliderId].disabled = false;
+            normalizeSliders(changedSliderId); return;
+        }
+        let unlockedCurrentTotal = 0; unlockedSliders.forEach(s => unlockedCurrentTotal += parseFloat(s.value));
+        let diff = unlockedCurrentTotal - targetForUnlocked;
+        let adjustableSliders = unlockedSliders.filter(s => s.id !== changedSliderId);
+        if (unlockedSliders.length === 1 && unlockedSliders[0].id === changedSliderId) { unlockedSliders[0].value = targetForUnlocked;
+        } else {
+            let adjustableTotal = 0; adjustableSliders.forEach(s => adjustableTotal += parseFloat(s.value));
+            if (adjustableTotal > 0) {
+                for (const slider of adjustableSliders) { const reduction = diff * (parseFloat(slider.value) / adjustableTotal); slider.value = Math.max(0, parseFloat(slider.value) - reduction); }
+            } else if (adjustableSliders.length > 0) { const reduction = diff / adjustableSliders.length; adjustableSliders.forEach(s => s.value = Math.max(0, parseFloat(s.value) - reduction)); }
+        }
+        let finalTotal = 0; sliders.forEach(s => finalTotal += parseFloat(s.value));
+        if (Math.round(finalTotal) !== 100) {
+            const mainUnlockedSlider = unlockedSliders.find(s => s.id === changedSliderId) || unlockedSliders[0];
+            if (mainUnlockedSlider) { mainUnlockedSlider.value = parseFloat(mainUnlockedSlider.value) + (100 - finalTotal); }
+        }
+        calculateAndDisplay();
     }
     
     function populateTooltips() {
-       // ... (функция без изменений)
+        for (const id in LHV_DATA) {
+            const eff_gasifier = parseFloat(inputs.efficiencies.gasifier.value) / 100;
+            const eff_ice = parseFloat(inputs.efficiencies.ice.value) / 100;
+            const eff_electric = parseFloat(inputs.efficiencies.electric.value) / 100;
+
+            const lhv = LHV_DATA[id]; let kgFor1kWh_el;
+            if (id === 'wood') { kgFor1kWh_el = 1.2; } else { kgFor1kWh_el = (1 / (eff_gasifier * eff_ice * eff_electric)) * 3.6 / lhv; }
+            const kgFor1kWh_th = (1 / eff_gasifier) * 3.6 / lhv;
+            const kcal = (lhv * MJ_TO_KCAL).toFixed(0);
+            
+            const tooltipElem = document.getElementById(`${id}-tooltip-text`);
+            if(tooltipElem) {
+              tooltipElem.innerHTML = `Теплотворность: <b>~${kcal} ккал/кг</b><hr>Для 1 кВт·ч электричества: <b>${kgFor1kWh_el.toFixed(2)} кг</b><br>Для 1 кВт·ч тепла (в сингазе): <b>${kgFor1kWh_th.toFixed(2)} кг</b>`;
+            }
+        }
     }
 
-    // ... (все обработчики событий без изменений)
+    inputs.totalMass.addEventListener('input', calculateAndDisplay);
+    inputs.woodHumidity.addEventListener('input', (e) => {
+        document.getElementById('wood-humidity-val').textContent = `${e.target.value}%`; calculateAndDisplay();
+    });
+    for (const id in inputs.sliders) {
+        inputs.sliders[id].addEventListener('input', () => normalizeSliders(id));
+        const checkbox = document.querySelector(`.lock-checkbox[data-id="${id}"]`);
+        checkbox.addEventListener('change', () => { inputs.sliders[id].disabled = checkbox.checked; normalizeSliders(id); });
+    }
+    for (const id in inputs.efficiencies) {
+        inputs.efficiencies[id].addEventListener('input', (e) => {
+            document.getElementById(`eff-${id}-val`).textContent = `${e.target.value}%`;
+            calculateAndDisplay();
+            populateTooltips();
+        });
+    }
+
+    window.addEventListener('load', () => {
+        populateTooltips(); 
+        calculateAndDisplay();
+        document.getElementById('wood-humidity-val').textContent = `${inputs.woodHumidity.value}%`;
+        document.getElementById('eff-gasifier-val').textContent = `${inputs.efficiencies.gasifier.value}%`;
+        document.getElementById('eff-ice-val').textContent = `${inputs.efficiencies.ice.value}%`;
+        document.getElementById('eff-electric-val').textContent = `${inputs.efficiencies.electric.value}%`;
+    });
 </script>
+
 </body>
 </html>
