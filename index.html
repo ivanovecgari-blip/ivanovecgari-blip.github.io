@@ -28,8 +28,8 @@
             color: var(--primary-text);
         }
         .container { max-width: 500px; margin: 0 auto; }
-        h2 { text-align: center; font-weight: 600; font-size: 1.3em; line-height: 1.4; margin-bottom: 15px; margin-top: 0;}
-        h3 { margin-top: 0; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+        h2 { text-align: center; font-weight: 600; font-size: 1.2em; line-height: 1.4; margin-bottom: 15px; margin-top: 0;}
+        h3 { margin-top: 0; display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 1.1em; }
         
         .sticky-header {
             position: -webkit-sticky; position: sticky;
@@ -48,7 +48,7 @@
             border-radius: 16px; padding: 20px; margin-bottom: 20px;
         }
 
-        .input-group label { margin-bottom: 8px; font-weight: 500; display: block; }
+        .input-group label { margin-bottom: 8px; font-weight: 500; display: block; font-size: 0.95em; }
         .input-group input {
             width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--card-bg);
             background-color: #415a77; color: var(--primary-text); font-size: 1em;
@@ -99,39 +99,34 @@
             border: 2px solid var(--card-bg); box-shadow: 0 0 0 2px var(--accent-glow);
         }
         
-        .results p { display: flex; justify-content: space-between; margin: 12px 0; }
+        .results p { display: flex; justify-content: space-between; margin: 12px 0; font-size: 0.95em; }
         .results p span:last-child { font-weight: 600; }
-
+        
         #notifications-container {
             margin-top: 15px; display: flex; flex-direction: column;
-            gap: 8px; max-height: 92px; overflow-y: auto;
+            gap: 5px; max-height: 65px; overflow-y: auto;
         }
         .notification-item {
-            display: flex; align-items: center; gap: 10px;
-            padding: 10px; border-radius: 8px; font-size: 0.9em;
-            background-color: var(--card-bg); border-left: 4px solid;
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 10px; border-radius: 6px; font-size: 0.8em;
+            background-color: var(--card-bg); border-left: 3px solid;
             flex-shrink: 0;
         }
         .notification-item.danger { border-color: var(--danger-color); }
         .notification-item.warning { border-color: var(--warning-color); }
         .notification-item.info { border-color: var(--info-color); }
-        .notification-item .icon { font-size: 1.2em; }
+        .notification-item .icon { font-size: 1.1em; }
 
-        /* --- НОВЫЕ СТИЛИ ДЛЯ ПОДСКАЗОК --- */
         .tooltip {
-            position: absolute; top: -5px; right: -5px;
+            position: absolute; top: -4px; right: -4px;
             display: inline-flex; align-items: center; justify-content: center;
-            width: 18px; height: 18px;
-            border-radius: 50%; border: 1px solid var(--secondary-text);
-            color: var(--secondary-text);
-            font-size: 12px; font-weight: 700;
+            width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--secondary-text);
+            color: var(--secondary-text); font-size: 10px; font-weight: 700;
             cursor: pointer; transition: all 0.2s;
         }
         .tooltip:hover {
-            background-color: var(--accent-color);
-            color: var(--card-bg);
-            border-color: var(--accent-color);
-            transform: scale(1.1);
+            background-color: var(--accent-color); color: var(--card-bg);
+            border-color: var(--accent-color); transform: scale(1.1);
         }
         .tooltip .tooltip-text {
             visibility: hidden; width: 250px; background-color: #3c4f65;
@@ -146,6 +141,7 @@
         code { background: #415a77; padding: 2px 4px; border-radius: 4px; font-family: 'Courier New', Courier, monospace;}
         .hidden { display: none !important; }
         footer { text-align: center; margin-top: 25px; font-size: 0.9em; color: var(--secondary-text); }
+        .header-divider { border: none; height: 1px; background-color: var(--card-bg); margin: 15px 0; }
         
         @media (max-width: 480px) {
             h2 { font-size: 1.1em; }
@@ -153,7 +149,7 @@
             .component-card, .efficiency-item { padding: 12px; }
             .title-group label { font-size: 1em; }
             .percentage { font-size: 1.1em; }
-            .results p { font-size: 0.95em; }
+            .results p { font-size: 0.9em; }
         }
     </style>
 </head>
@@ -167,12 +163,13 @@
                 <label for="total-mass">Общее количество смеси, кг</label>
                 <input type="number" id="total-mass" value="100">
             </div>
-        </div>
-        <div class="section results">
-            <h3>⚡️ Результаты</h3>
-            <p><span>Электрическая мощность</span><span id="res-power-el">0 кВт</span></p>
-            <p><span>Тепловая мощность</span><span id="res-power-th">0 кВт</span></p>
-            <div id="notifications-container"></div>
+            <hr class="header-divider">
+            <div class="results">
+                <h3>⚡️ Результаты</h3>
+                <p><span>Электрическая мощность</span><span id="res-power-el">0 кВт</span></p>
+                <p><span>Тепловая мощность</span><span id="res-power-th">0 кВт</span></p>
+                <div id="notifications-container"></div>
+            </div>
         </div>
     </div>
 
@@ -273,7 +270,7 @@
     </div>
 </div>
 
-<footer><p>v1.6 | 2025 г. При содействии Лагунова Сергея.</p></footer>
+<footer><p>v1.7 | 2025 г. При содействии Лагунова Сергея.</p></footer>
 
 <script>
     const tg = window.Telegram.WebApp;
