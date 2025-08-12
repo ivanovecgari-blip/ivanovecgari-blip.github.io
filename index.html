@@ -28,7 +28,7 @@
             color: var(--primary-text);
         }
         .container { max-width: 500px; margin: 0 auto; }
-        h2 { text-align: center; font-weight: 600; font-size: 1.2em; line-height: 1.4; margin-bottom: 15px; margin-top: 0;}
+        h2 { text-align: center; font-weight: 600; font-size: 1.3em; line-height: 1.4; margin-bottom: 15px; margin-top: 0;}
         h3 { margin-top: 0; display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 1.1em; }
         
         .sticky-header {
@@ -46,6 +46,11 @@
         .section {
             background-color: var(--section-bg);
             border-radius: 16px; padding: 20px; margin-bottom: 20px;
+        }
+
+        #composition-section {
+            border: 2px solid white;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
         }
 
         .input-group label { margin-bottom: 8px; font-weight: 500; display: block; font-size: 0.95em; }
@@ -99,7 +104,7 @@
             border: 2px solid var(--card-bg); box-shadow: 0 0 0 2px var(--accent-glow);
         }
         
-        .results p { display: flex; justify-content: space-between; margin: 12px 0; font-size: 0.95em; }
+        .results p { display: flex; justify-content: space-between; margin: 12px 0; font-size: 0.95em;}
         .results p span:last-child { font-weight: 600; }
         
         #notifications-container {
@@ -173,11 +178,11 @@
         </div>
     </div>
 
-    <div class="section">
+    <div class="section" id="composition-section">
         <h3>Состав смеси</h3>
         <div class="component-card" id="wood-card">
             <div class="card-header">
-                <input type="checkbox" class="lock-checkbox" data-id="wood"><div class="title-group"><label for="wood">Древесина</label><span class="subtitle">(щепа, бумага, ветки)</span></div>
+                <input type="checkbox" class="lock-checkbox" data-id="wood"><div class="title-group"><label for="wood">Древесина</label><span class="subtitle">(воздушно-сухая и др.)</span></div>
                 <span class="tooltip">i<span class="tooltip-text" id="wood-tooltip-text"></span></span>
             </div>
             <div class="card-body">
@@ -195,7 +200,7 @@
 
         <div class="component-card" id="plastic-card">
             <div class="card-header">
-                <input type="checkbox" class="lock-checkbox" data-id="plastic"><div class="title-group"><label for="plastic">Пластик</label><span class="subtitle">(мягкий, ПЭТ)</span></div>
+                <input type="checkbox" class="lock-checkbox" data-id="plastic"><div class="title-group"><label for="plastic">Пластик ПНД</label><span class="subtitle">(канистры, пленка)</span></div>
                 <span class="tooltip">i<span class="tooltip-text" id="plastic-tooltip-text"></span></span>
             </div>
             <div class="card-body">
@@ -217,7 +222,7 @@
 
         <div class="component-card" id="rubber-card">
             <div class="card-header">
-                <input type="checkbox" class="lock-checkbox" data-id="rubber" checked><div class="title-group"><label for="rubber">Резина</label></div>
+                <input type="checkbox" class="lock-checkbox" data-id="rubber" checked><div class="title-group"><label for="rubber">Автопокрышки</label></div>
                 <span class="tooltip">i<span class="tooltip-text" id="rubber-tooltip-text"></span></span>
             </div>
             <div class="card-body">
@@ -228,7 +233,7 @@
 
         <div class="component-card" id="rags-card">
             <div class="card-header">
-                <input type="checkbox" class="lock-checkbox" data-id="rags" checked><div class="title-group"><label for="rags">Тряпки</label></div>
+                <input type="checkbox" class="lock-checkbox" data-id="rags" checked><div class="title-group"><label for="rags">Ткань (синтетика)</label></div>
                 <span class="tooltip">i<span class="tooltip-text" id="rags-tooltip-text"></span></span>
             </div>
             <div class="card-body">
@@ -270,16 +275,20 @@
     </div>
 </div>
 
-<footer><p>v1.7 | 2025 г. При содействии Лагунова Сергея.</p></footer>
+<footer><p>v1.8 | 2025 г. При содействии Лагунова Сергея.</p></footer>
 
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    const LHV_DATA = { wood: 17, plastic: 42, cellophane: 17.5, rubber: 30, rags: 16 };
+    const LHV_DATA = { 
+        wood: 14.2,
+        plastic: 43,
+        cellophane: 17.5,
+        rubber: 33,
+        rags: 24
+    };
     const MJ_TO_KCAL = 239.006;
-    const HUMIDITY_PENALTY_FACTOR = 1.7;
-    const HUMIDITY_THRESHOLD = 25;
     const THERMAL_POWER_MULTIPLIER = 2.87;
 
     const inputs = {
@@ -310,15 +319,19 @@
         }
 
         const woodHumidity = parseFloat(inputs.woodHumidity.value);
-        let lhv_wood_effective = LHV_DATA.wood;
-        
-        const activeWarnings = [];
+        let lhv_wood_effective;
 
-        if (perc.wood > 0 && woodHumidity > HUMIDITY_THRESHOLD) {
-            lhv_wood_effective = LHV_DATA.wood / HUMIDITY_PENALTY_FACTOR;
-            activeWarnings.push({type: 'info', text: `Эффективность древесины снижена из-за влажности > ${HUMIDITY_THRESHOLD}%.`});
+        if (perc.wood > 0) {
+            lhv_wood_effective = 21.375 - (0.2575 * woodHumidity);
+            lhv_wood_effective = Math.max(8.5, Math.min(18.8, lhv_wood_effective));
+        } else {
+            lhv_wood_effective = LHV_DATA.wood;
         }
         
+        const activeWarnings = [];
+        if (perc.wood > 0 && woodHumidity > 25) {
+            activeWarnings.push({type: 'info', text: `Влажность древесины > 25%, эффективность снижена.`});
+        }
         if (perc.plastic + perc.rubber > 40) {
             activeWarnings.push({type: 'warning', text: 'Высокая доля пластика/резины может привести к смолообразованию.'});
         }
@@ -334,7 +347,6 @@
 
         const notificationsContainer = document.getElementById('notifications-container');
         notificationsContainer.innerHTML = '';
-        
         if (activeWarnings.length > 0) {
             activeWarnings.forEach(warning => {
                 const warningDiv = document.createElement('div');
@@ -343,7 +355,6 @@
                 if(warning.type === 'danger') icon = '🔴';
                 if(warning.type === 'warning') icon = '🟠';
                 if(warning.type === 'info') icon = '🔵';
-                
                 warningDiv.innerHTML = `<span class="icon">${icon}</span> <span>${warning.text}</span>`;
                 notificationsContainer.appendChild(warningDiv);
             });
