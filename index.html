@@ -109,9 +109,10 @@
         
         #notifications-container {
             display: flex; flex-direction: column; gap: 5px;
-            height: 42px; /* Фиксированная высота для ~1.5 элементов */
+            min-height: 42px; 
+            height: 42px;
             overflow-y: auto;
-            visibility: hidden; /* Скрываем, но место оставляем */
+            visibility: hidden; 
             opacity: 0;
             transition: opacity 0.3s, visibility 0.3s;
             margin-top: 10px;
@@ -176,7 +177,7 @@
         <div class="section">
             <div class="input-group">
                 <label for="total-mass">Общее количество смеси, кг</label>
-                <input type="number" id="total-mass" value="100">
+                <input type="number" id="total-mass" value="10">
             </div>
             <hr class="header-divider">
             <div class="results">
@@ -196,8 +197,8 @@
                 <span class="tooltip">i<span class="tooltip-text" id="wood-tooltip-text"></span></span>
             </div>
             <div class="card-body">
-                <input type="range" id="wood" min="0" max="100" value="50" step="1">
-                <div class="value-display"><span class="percentage" id="wood-val">50%</span><span class="mass" id="wood-mass">(50.0 кг)</span></div>
+                <input type="range" id="wood" min="0" max="100" value="100" step="1">
+                <div class="value-display"><span class="percentage" id="wood-val">100%</span><span class="mass" id="wood-mass">(10.0 кг)</span></div>
             </div>
             <div class="card-subsection hidden" id="wood-humidity-block">
                 <div class="subsection-body">
@@ -210,12 +211,12 @@
 
         <div class="component-card" id="plastic-card">
             <div class="card-header">
-                <input type="checkbox" class="lock-checkbox" data-id="plastic"><div class="title-group"><label for="plastic">Пластик ПНД</label><span class="subtitle">(канистры, пленка)</span></div>
+                <input type="checkbox" class="lock-checkbox" data-id="plastic" checked><div class="title-group"><label for="plastic">Пластик ПНД</label><span class="subtitle">(канистры, пленка)</span></div>
                 <span class="tooltip">i<span class="tooltip-text" id="plastic-tooltip-text"></span></span>
             </div>
             <div class="card-body">
-                <input type="range" id="plastic" min="0" max="100" value="50" step="1">
-                <div class="value-display"><span class="percentage" id="plastic-val">50%</span><span class="mass" id="plastic-mass">(50.0 кг)</span></div>
+                <input type="range" id="plastic" min="0" max="100" value="0" step="1" disabled>
+                <div class="value-display"><span class="percentage" id="plastic-val">0%</span><span class="mass" id="plastic-mass">(0.0 кг)</span></div>
             </div>
         </div>
 
@@ -285,7 +286,7 @@
     </div>
 </div>
 
-<footer><p>v2.0 | 2025 г. Лагунов Сергей.</p></footer>
+<footer><p>v2.1 | 2025 г. Лагунов Сергей.</p></footer>
 
 <script>
     const tg = window.Telegram.WebApp;
