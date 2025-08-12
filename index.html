@@ -59,7 +59,7 @@
             background-color: var(--card-bg);
             border-radius: 12px; padding: 15px; margin-bottom: 15px;
         }
-        .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .card-header { position: relative; display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
         .lock-checkbox { transform: scale(1.4); flex-shrink: 0; }
         .title-group { flex-grow: 1; }
         .title-group label { font-size: 1.1em; font-weight: 600; }
@@ -98,13 +98,6 @@
             background: var(--accent-color); border-radius: 50%;
             border: 2px solid var(--card-bg); box-shadow: 0 0 0 2px var(--accent-glow);
         }
-        input[type=range]::-moz-range-track {
-             width: 100%; height: 6px; background: var(--section-bg); border-radius: 3px;
-        }
-        input[type=range]::-moz-range-thumb {
-            height: 18px; width: 18px; background: var(--accent-color);
-            border-radius: 50%; border: 2px solid var(--card-bg); box-shadow: 0 0 0 2px var(--accent-glow);
-        }
         
         .results p { display: flex; justify-content: space-between; margin: 12px 0; }
         .results p span:last-child { font-weight: 600; }
@@ -124,27 +117,36 @@
         .notification-item.info { border-color: var(--info-color); }
         .notification-item .icon { font-size: 1.2em; }
 
-        code { background: #415a77; padding: 2px 4px; border-radius: 4px; font-family: 'Courier New', Courier, monospace;}
-        .hidden { display: none !important; }
-        footer { text-align: center; margin-top: 25px; font-size: 0.9em; color: var(--secondary-text); }
-        
+        /* --- НОВЫЕ СТИЛИ ДЛЯ ПОДСКАЗОК --- */
         .tooltip {
-            position: relative; display: inline-flex; align-items: center; justify-content: center;
-            cursor: pointer; color: var(--secondary-text); border: 1px solid var(--secondary-text);
-            border-radius: 50%; width: 20px; height: 20px; font-size: 12px;
-            transition: color 0.2s, border-color 0.2s;
+            position: absolute; top: -5px; right: -5px;
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 18px; height: 18px;
+            border-radius: 50%; border: 1px solid var(--secondary-text);
+            color: var(--secondary-text);
+            font-size: 12px; font-weight: 700;
+            cursor: pointer; transition: all 0.2s;
         }
-        .tooltip:hover { color: var(--accent-color); border-color: var(--accent-color); }
+        .tooltip:hover {
+            background-color: var(--accent-color);
+            color: var(--card-bg);
+            border-color: var(--accent-color);
+            transform: scale(1.1);
+        }
         .tooltip .tooltip-text {
-            visibility: hidden; width: 280px; background-color: #2a3b4d;
-            color: #fff; text-align: left; border-radius: 6px; padding: 10px;
-            position: absolute; z-index: 1; bottom: 125%; left: 50%;
-            margin-left: -140px; opacity: 0; transition: opacity 0.3s;
-            font-size: 14px; line-height: 1.4; font-weight: normal;
+            visibility: hidden; width: 250px; background-color: #3c4f65;
+            color: #fff; text-align: left; border-radius: 8px; padding: 12px;
+            position: absolute; z-index: 10; bottom: 125%; left: 50%;
+            transform: translateX(-50%); opacity: 0; transition: opacity 0.3s;
+            font-size: 14px; line-height: 1.5; font-weight: normal;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         .tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
 
+        code { background: #415a77; padding: 2px 4px; border-radius: 4px; font-family: 'Courier New', Courier, monospace;}
+        .hidden { display: none !important; }
+        footer { text-align: center; margin-top: 25px; font-size: 0.9em; color: var(--secondary-text); }
+        
         @media (max-width: 480px) {
             h2 { font-size: 1.1em; }
             .section { padding: 15px; }
@@ -179,7 +181,7 @@
         <div class="component-card" id="wood-card">
             <div class="card-header">
                 <input type="checkbox" class="lock-checkbox" data-id="wood"><div class="title-group"><label for="wood">Древесина</label><span class="subtitle">(щепа, бумага, ветки)</span></div>
-                <span class="tooltip">ⓘ<span class="tooltip-text" id="wood-tooltip-text"></span></span>
+                <span class="tooltip">i<span class="tooltip-text" id="wood-tooltip-text"></span></span>
             </div>
             <div class="card-body">
                 <input type="range" id="wood" min="0" max="100" value="50" step="1">
@@ -197,7 +199,7 @@
         <div class="component-card" id="plastic-card">
             <div class="card-header">
                 <input type="checkbox" class="lock-checkbox" data-id="plastic"><div class="title-group"><label for="plastic">Пластик</label><span class="subtitle">(мягкий, ПЭТ)</span></div>
-                <span class="tooltip">ⓘ<span class="tooltip-text" id="plastic-tooltip-text"></span></span>
+                <span class="tooltip">i<span class="tooltip-text" id="plastic-tooltip-text"></span></span>
             </div>
             <div class="card-body">
                 <input type="range" id="plastic" min="0" max="100" value="50" step="1">
@@ -208,7 +210,7 @@
         <div class="component-card" id="cellophane-card">
             <div class="card-header">
                 <input type="checkbox" class="lock-checkbox" data-id="cellophane" checked><div class="title-group"><label for="cellophane">Целлофан</label></div>
-                <span class="tooltip">ⓘ<span class="tooltip-text" id="cellophane-tooltip-text"></span></span>
+                <span class="tooltip">i<span class="tooltip-text" id="cellophane-tooltip-text"></span></span>
             </div>
             <div class="card-body">
                 <input type="range" id="cellophane" min="0" max="100" value="0" step="1" disabled>
@@ -219,7 +221,7 @@
         <div class="component-card" id="rubber-card">
             <div class="card-header">
                 <input type="checkbox" class="lock-checkbox" data-id="rubber" checked><div class="title-group"><label for="rubber">Резина</label></div>
-                <span class="tooltip">ⓘ<span class="tooltip-text" id="rubber-tooltip-text"></span></span>
+                <span class="tooltip">i<span class="tooltip-text" id="rubber-tooltip-text"></span></span>
             </div>
             <div class="card-body">
                 <input type="range" id="rubber" min="0" max="100" value="0" step="1" disabled>
@@ -230,7 +232,7 @@
         <div class="component-card" id="rags-card">
             <div class="card-header">
                 <input type="checkbox" class="lock-checkbox" data-id="rags" checked><div class="title-group"><label for="rags">Тряпки</label></div>
-                <span class="tooltip">ⓘ<span class="tooltip-text" id="rags-tooltip-text"></span></span>
+                <span class="tooltip">i<span class="tooltip-text" id="rags-tooltip-text"></span></span>
             </div>
             <div class="card-body">
                 <input type="range" id="rags" min="0" max="100" value="0" step="1" disabled>
@@ -271,7 +273,7 @@
     </div>
 </div>
 
-<footer><p>2025 г. При содействии Лагунова Сергея.</p></footer>
+<footer><p>v1.6 | 2025 г. При содействии Лагунова Сергея.</p></footer>
 
 <script>
     const tg = window.Telegram.WebApp;
@@ -340,7 +342,7 @@
             activeWarnings.forEach(warning => {
                 const warningDiv = document.createElement('div');
                 warningDiv.className = `notification-item ${warning.type}`;
-                let icon = 'ℹ️';
+                let icon = 'i';
                 if(warning.type === 'danger') icon = '🔴';
                 if(warning.type === 'warning') icon = '🟠';
                 if(warning.type === 'info') icon = '🔵';
