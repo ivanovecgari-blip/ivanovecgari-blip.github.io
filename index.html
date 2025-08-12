@@ -107,10 +107,21 @@
         .results p { display: flex; justify-content: space-between; margin: 12px 0; font-size: 0.95em;}
         .results p span:last-child { font-weight: 600; }
         
+        /* --- ИЗМЕНЕНИЯ ЗДЕСЬ --- */
         #notifications-container {
-            margin-top: 15px; display: flex; flex-direction: column;
-            gap: 5px; max-height: 65px; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 5px;
+            min-height: 65px; /* Резервируем место */
+            overflow-y: auto;
+            visibility: hidden; /* Скрываем, но место оставляем */
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s;
         }
+        #notifications-container.visible {
+            visibility: visible;
+            opacity: 1;
+        }
+        /* --- КОНЕЦ ИЗМЕНЕНИЙ --- */
+
         .notification-item {
             display: flex; align-items: center; gap: 8px;
             padding: 6px 10px; border-radius: 6px; font-size: 0.8em;
@@ -197,7 +208,6 @@
                 </div>
             </div>
         </div>
-
         <div class="component-card" id="plastic-card">
             <div class="card-header">
                 <input type="checkbox" class="lock-checkbox" data-id="plastic"><div class="title-group"><label for="plastic">Пластик ПНД</label><span class="subtitle">(канистры, пленка)</span></div>
@@ -208,7 +218,6 @@
                 <div class="value-display"><span class="percentage" id="plastic-val">50%</span><span class="mass" id="plastic-mass">(50.0 кг)</span></div>
             </div>
         </div>
-
         <div class="component-card" id="cellophane-card">
             <div class="card-header">
                 <input type="checkbox" class="lock-checkbox" data-id="cellophane" checked><div class="title-group"><label for="cellophane">Целлофан</label></div>
@@ -219,7 +228,6 @@
                 <div class="value-display"><span class="percentage" id="cellophane-val">0%</span><span class="mass" id="cellophane-mass">(0.0 кг)</span></div>
             </div>
         </div>
-
         <div class="component-card" id="rubber-card">
             <div class="card-header">
                 <input type="checkbox" class="lock-checkbox" data-id="rubber" checked><div class="title-group"><label for="rubber">Автопокрышки</label></div>
@@ -230,7 +238,6 @@
                 <div class="value-display"><span class="percentage" id="rubber-val">0%</span><span class="mass" id="rubber-mass">(0.0 кг)</span></div>
             </div>
         </div>
-
         <div class="component-card" id="rags-card">
             <div class="card-header">
                 <input type="checkbox" class="lock-checkbox" data-id="rags" checked><div class="title-group"><label for="rags">Ткань (синтетика)</label></div>
@@ -275,7 +282,7 @@
     </div>
 </div>
 
-<footer><p>v1.8 | 2025 г. При содействии Лагунова Сергея.</p></footer>
+<footer><p>v1.7 | 2025 г. Лагунов Сергей.</p></footer>
 
 <script>
     const tg = window.Telegram.WebApp;
@@ -347,7 +354,9 @@
 
         const notificationsContainer = document.getElementById('notifications-container');
         notificationsContainer.innerHTML = '';
+        
         if (activeWarnings.length > 0) {
+            notificationsContainer.classList.add('visible'); // Используем новый класс
             activeWarnings.forEach(warning => {
                 const warningDiv = document.createElement('div');
                 warningDiv.className = `notification-item ${warning.type}`;
@@ -358,6 +367,8 @@
                 warningDiv.innerHTML = `<span class="icon">${icon}</span> <span>${warning.text}</span>`;
                 notificationsContainer.appendChild(warningDiv);
             });
+        } else {
+            notificationsContainer.classList.remove('visible'); // Убираем класс, чтобы скрыть
         }
 
         const lhv_mix = ((perc.wood * lhv_wood_effective) + (perc.plastic * LHV_DATA.plastic) + (perc.cellophane * LHV_DATA.cellophane) + (perc.rubber * LHV_DATA.rubber) + (perc.rags * LHV_DATA.rags)) / 100;
